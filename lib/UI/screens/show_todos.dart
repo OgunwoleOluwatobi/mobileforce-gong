@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:team_mobileforce_gong/UI/screens/add_todo.dart';
 import 'package:team_mobileforce_gong/models/todo.dart';
@@ -125,6 +126,12 @@ class ShowTodos extends StatelessWidget {
                                 ),
                                 Column(
                                   children: <Widget>[
+                                    !todos[index].uploaded || todos[index].shouldUpdate ? Container(
+                                      child: SvgPicture.asset(
+                                        'assets/svgs/upload.svg',
+                                        width: 15
+                                      ),
+                                    ) : SizedBox(),
                                     Theme(
                                       data: ThemeData(unselectedWidgetColor: blue),
                                       child: Checkbox(

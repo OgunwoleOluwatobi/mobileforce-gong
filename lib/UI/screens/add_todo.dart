@@ -89,7 +89,34 @@ class _AddTodoState extends State<AddTodo> {
                   children: <Widget>[
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        if(widget.stitle != null || widget.scontent != null) {
+                          if(_stitle ==null && _scontent == null) {
+                            Navigator.pop(context);
+                          } else {
+                            Provider.of<TodoProvider>(context, listen: false).updateTodo(
+                              _stitle ?? widget.stitle, 
+                              _selectedcategory == null ? widget.scategory : _selectedcategory.name, 
+                              Provider.of<AuthenticationState>(context, listen: false).uid, 
+                              _scontent ?? widget.scontent, 
+                              _sdate ?? DateFormat("dd/MM/yy").parse(widget.sdate), 
+                              _stime ?? TimeOfDay(hour:int.parse(widget.sdate.split(":")[0]),minute: int.parse(widget.sdate.split(":")[1])), 
+                              widget.stodo
+                            );
+                            Navigator.pop(context);
+                          }
+                        } else if(_stitle ==null && _scontent == null) {
+                          Navigator.pop(context);
+                        } else {
+                          Provider.of<TodoProvider>(context, listen: false).createTodo(
+                            _stitle,
+                            _selectedcategory == null ? null : _selectedcategory.name,
+                            Provider.of<AuthenticationState>(context, listen: false).uid,
+                            _scontent,
+                            _sdate,
+                            _stime
+                          );
+                          Navigator.pop(context);
+                        }
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical: SizeConfig().yMargin(context, 2.1), horizontal: SizeConfig().xMargin(context, 1.9)),

@@ -135,11 +135,22 @@ class ShowNotes extends StatelessWidget {
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
-                                            Container(
-                                              child: Text(
-                                                notes[index].date ?? '',
-                                                style: Theme.of(context).textTheme.headline6.copyWith(fontSize: SizeConfig().textSize(context, 1.6))
-                                              ),
+                                            Column(
+                                              children: <Widget>[
+                                                !notes[index].uploaded || notes[index].shouldUpdate ? Container(
+                                                  child: SvgPicture.asset(
+                                                    'assets/svgs/upload.svg',
+                                                    width: 15,
+                                                    color: Colors.black45,
+                                                  ),
+                                                ) : SizedBox(),
+                                                Container(
+                                                  child: Text(
+                                                    notes[index].date ?? '',
+                                                    style: Theme.of(context).textTheme.headline6.copyWith(fontSize: SizeConfig().textSize(context, 1.6))
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         )

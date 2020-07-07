@@ -106,7 +106,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Provider.of<NotesProvider>(context).notes.length == 0
+                Provider.of<NotesProvider>(context).notes.length == 0 && Provider.of<TodoProvider>(context).todos.length == 0
                     ? Container(
                         padding: EdgeInsets.only(
                             right: MediaQuery.of(context).size.width * 0.2,

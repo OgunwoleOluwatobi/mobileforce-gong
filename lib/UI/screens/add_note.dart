@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:team_mobileforce_gong/models/note_model.dart';
 import 'package:team_mobileforce_gong/state/authProvider.dart';
@@ -23,19 +27,27 @@ class AddNote extends StatefulWidget {
 class _AddNoteState extends State<AddNote> {
   String _title;
   String _content;
+  //List<String> img = [];
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
+    var model = Provider.of<NotesProvider>(context);
     return WillPopScope(
       onWillPop: () async {
         if(widget.stitle != null || widget.scontent != null) { 
-          Provider.of<NotesProvider>(context, listen: false).updateNote(
-            Provider.of<AuthenticationState>(context, listen: false).uid,
-            _title ?? widget.stitle,
-            _content ?? widget.scontent,
-            widget.simportant,
-            widget.snote
-          );
+          if(_title ==null && _content == null){
+            Navigator.pop(context);
+          } else {
+            Provider.of<NotesProvider>(context, listen: false).updateNote(
+              Provider.of<AuthenticationState>(context, listen: false).uid,
+              _title ?? widget.stitle,
+              _content ?? widget.scontent,
+              widget.simportant,
+              widget.snote
+            );
+            Navigator.pop(context);
+          }
         } else if(_title ==null && _content == null) {
           Navigator.pop(context);
         } else {
@@ -52,6 +64,7 @@ class _AddNoteState extends State<AddNote> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         resizeToAvoidBottomPadding: false,
+        key: scaffoldKey,
         body: Container(
           padding: EdgeInsets.only(bottom: 20),
           width: MediaQuery.of(context).size.width,
@@ -71,13 +84,18 @@ class _AddNoteState extends State<AddNote> {
                       onTap: () {
                         //print(widget.stitle+' '+_title);
                         if(widget.stitle != null || widget.scontent != null) { 
-                          Provider.of<NotesProvider>(context, listen: false).updateNote(
-                            Provider.of<AuthenticationState>(context, listen: false).uid,
-                            _title ?? widget.stitle,
-                            _content ?? widget.scontent,
-                            widget.simportant,
-                            widget.snote
-                          );
+                          if(_title ==null && _content == null){
+                                Navigator.pop(context);
+                              } else {
+                                Provider.of<NotesProvider>(context, listen: false).updateNote(
+                                  Provider.of<AuthenticationState>(context, listen: false).uid,
+                                  _title ?? widget.stitle,
+                                  _content ?? widget.scontent,
+                                  widget.simportant,
+                                  widget.snote
+                                );
+                                Navigator.pop(context);
+                              }
                         } else if(_title ==null && _content == null) {
                           Navigator.pop(context);
                         } else {
@@ -164,6 +182,14 @@ class _AddNoteState extends State<AddNote> {
                               Container(
                                 child: Column(
                                   children: <Widget>[
+                                    // Row(
+                                    //   children: <Widget>[
+                                    //     for (var item in model.img)
+                                    //       Text(
+                                    //         Base64Decoder().convert(item).toString()
+                                    //       )
+                                    //   ],
+                                    // ),
                                     TextFormField(
                                       maxLines: null,
                                       maxLengthEnforced: false,
@@ -252,7 +278,74 @@ class _AddNoteState extends State<AddNote> {
                   )
                 ),
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    scaffoldKey.currentState.showBottomSheet(
+                      (context) => Container(
+                        height: 100,
+                        child: Column(
+                          children: <Widget>[
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                                ImagePicker().getImage(source: ImageSource.camera).then((value)async {
+                                  Uint8List data = await value.readAsBytes();
+                                  print(data);
+                                  setState(() {
+                                    model.img.add(base64Encode(data));
+                                    print(Base64Decoder().convert(model.img[0]).toString());
+                                    //print(img.toString());
+                                  });
+                                });
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                                child: Row(
+                                  children: <Widget>[
+                                    SvgPicture.asset(
+                                      'assets/svgs/camera.svg',
+                                      width: 20,
+                                    ),
+                                    Container(
+                                      child: Text(
+                                        'Take Photo'
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                                ImagePicker().getImage(source: ImageSource.gallery).then((value)async {
+                                  Uint8List data = await value.readAsBytes();
+                                  setState(() {
+                                    model.img.add(base64Encode(data));
+                                  });
+                                });
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                                child: Row(
+                                  children: <Widget>[
+                                    SvgPicture.asset(
+                                      'assets/svgs/gallery.svg',
+                                      width: 20
+                                    ),
+                                    Container(
+                                      child: Text(
+                                        'Select from gallery'
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    );
+                  },
                   child: Row(
                     children: <Widget>[
                       Container(
